@@ -5,7 +5,7 @@ from users.models import ExtendedUser
 
 
 class Group(models.Model):
-    name = models.CharField(max_lengh=50, unique=True)
+    name = models.CharField(max_length=50, unique=True)
     profile_picture = models.URLField(max_length=200)
 
     users = models.ManyToManyField(
