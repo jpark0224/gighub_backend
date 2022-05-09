@@ -43,6 +43,7 @@ INSTALLED_APPS = [
 
     # 1st Party
     'users',
+    'groups'
 ]
 
 MIDDLEWARE = [
