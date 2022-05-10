@@ -23,6 +23,8 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("posts/", include("posts.urls")),
     path("groups/", include("groups.urls")),
+    path("comments/", include("comments.urls")),
+
     path('api-auth/', include("rest_framework.urls")),
     path('dj-rest-auth/', include('dj_rest_auth.urls')),
     path("api/token", jwt_views.TokenObtainPairView.as_view(),  # access token + refresh token

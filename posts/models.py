@@ -18,5 +18,10 @@ class Post(models.Model):
     user = models.ForeignKey(ExtendedUser,
                              on_delete=models.CASCADE, related_name="posted_user")
 
+    liked_user = models.ForeignKey(ExtendedUser, default='',
+                                   on_delete=models.CASCADE, related_name="post_liked_user")
+    bookmarked_user = models.ForeignKey(ExtendedUser, default='',
+                                        on_delete=models.CASCADE, related_name="bookmarked_user")
+
     def __str__(self):
         return f"{self.contents}"

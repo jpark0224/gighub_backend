@@ -6,7 +6,7 @@ from users.models import ExtendedUser
 
 class Group(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    profile_picture = models.URLField(max_length=200)
+    profile_picture = models.URLField(max_length=200, null=True, blank=True)
 
     users = models.ManyToManyField(
         ExtendedUser, blank=True, related_name="users_following_group")

@@ -1,9 +1,16 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from comments.models import Comment
 
 from groups.models import Group
 from posts.models import Post
 from users.models import ExtendedUser
+
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ("name",)
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -18,11 +25,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("email", "display_name", "is_artist", "profile_picture", )
 
 
-class PostSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     group = GroupSerializer()
     user = UserSerializer()
     liked_user = UserSerializer()
-    bookmarked_user = UserSerializer()
+    post = PostSerializer()
 
     class Meta:
         model = Post
@@ -45,14 +52,13 @@ class PostSerializer(serializers.ModelSerializer):
 
     # data is already validated
     def create(self, data):
+        post_data = data.pop("post")
         user_data = data.pop("user")
         liked_user_data = data.pop("liked_user")
-        bookmarked_user_data = data.pop("bookmarked_user")
         group_data = data.pop("group")
 
-        post = Post(
+        comment = Comment(
             contents=data["contents"],
-            picture=data["picture"],
         )
 
         if liked_user_data:
@@ -60,64 +66,61 @@ class PostSerializer(serializers.ModelSerializer):
                 **user_data)
             post.liked_user = liked_user
 
-        if bookmarked_user_data:
-            bookmarked_user, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            post.bookmarked_user = bookmarked_user
+        if post_data:
+            post, _created = Post.objects.get_or_create(**post_data)
+            comment.post = post
 
         if user_data:
             user, _created = ExtendedUser.objects.get_or_create(**user_data)
-            post.user = user
+            comment.user = user
 
         if group_data:
             group, _created = Group.objects.get_or_create(**group_data)
-            post.group = group
+            comment.group = group
 
-        # set the creator of a post to be the currently logged-in user
+        # set the creator of a comment to be the currently logged-in user
         request = self.context.get("request")
         if request and hasattr(request, "user"):
-            post.user = request.user
+            comment.user = request.user
 
         # Need to save to get the id
-        post.save()
+        comment.save()
 
         # render to the api
-        return post
+        return comment
 
-    def update(self, post, data):
+    def update(self, comment, data):
+        post_data = data.pop("post")
         user_data = data.pop("user")
         liked_user_data = data.pop("liked_user")
-        bookmarked_user_data = data.pop("bookmarked_user")
         group_data = data.pop("group")
 
-        post.contents = data.get("contents", post.contents)
-        post.picture = data.get("picture", post.picture)
+        comment.contents = data.get("contents", comment.contents)
 
         if liked_user_data:
             liked_user, _created = ExtendedUser.objects.get_or_create(
                 **user_data)
             post.liked_user = liked_user
 
-        if bookmarked_user_data:
-            bookmarked_user, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            post.bookmarked_user = bookmarked_user
+        if post_data:
+            post, _created = Post.objects.get_or_create(**post_data)
+            comment.post = post
 
         if user_data:
             user, _created = ExtendedUser.objects.get_or_create(**user_data)
-            post.user = user
+            comment.user = user
 
         if group_data:
             group, _created = Group.objects.get_or_create(**group_data)
-            post.group = group
+            comment.group = group
 
-        # set the creator of a post to be the currently logged-in user
+        # set the creator of a comment to be the currently logged-in user
         request = self.context.get("request")
         if request and hasattr(request, "user"):
-            post.user = request.user
+            comment.user = request.user
 
         # Need to save to get the id
-        post.save()
+        comment.save()
 
         # render to the api
-        return post
+        return comment

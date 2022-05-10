@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     # 1st Party
     'users',
     'groups',
-    'posts'
+    'posts',
+    'comments'
 ]
 
 MIDDLEWARE = [
