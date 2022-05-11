@@ -26,8 +26,13 @@ SECRET_KEY = 'django-insecure-m&jt&l%3*zi5oxugstl13gvhn1ndzfbaj)leg%dm4za0l9jsvr
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["gighub1.herokuapp.com",
+                 "localhost", "127.0.0.1"]
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+]
 
 # Application definition
 
@@ -44,6 +49,7 @@ INSTALLED_APPS = [
     'dj_rest_auth',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
+    'corsheaders',
 
     # 1st Party
     'users',
@@ -55,11 +61,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -134,6 +142,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Location where django collect all static files
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
@@ -144,7 +157,7 @@ AUTH_USER_MODEL = 'users.ExtendedUser'
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny"
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly"
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         # "rest_framework.authentication.SessionAuthentication",
@@ -159,4 +172,10 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(weeks=1),
     'ALGORITHM': 'HS256',
     'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default='postgres://juliepark@localhost/gighub'
+    )
 }

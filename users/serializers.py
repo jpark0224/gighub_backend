@@ -32,15 +32,21 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 {"password": "Password fields don't match."}
             )
+        return attributes
 
     def create(self, data):
+
+        if hasattr(data, "profile_picture"):
+            profile_picture_input = data["profile_picture"]
+        else:
+            profile_picture_input = ""
+
         user = ExtendedUser.objects.create(
             username=data['username'],
             display_name=data['display_name'],
             password=data['password'],
             email=data['email'],
-            profile_picture=data['profile_picture'],
-            is_artist=data['is_artist'])
+            profile_picture=profile_picture_input)
 
         user.set_password(data['password'])
 
