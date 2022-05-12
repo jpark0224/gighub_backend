@@ -1,4 +1,4 @@
-from backend.permissions import IsCreatorOrReadOnly
+from backend.permissions import IsCreatorOrReadOnly, IsGroupEditor
 from groups.models import Group
 from groups.serializers import GroupSerializer
 from rest_framework import generics
@@ -11,6 +11,6 @@ class GroupListView(generics.ListCreateAPIView):
 
 
 class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
-    permission_classes = [IsCreatorOrReadOnly]
+    permission_classes = [IsGroupEditor]
     queryset = Group.objects.all()
     serializer_class = GroupSerializer

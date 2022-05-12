@@ -14,6 +14,16 @@ class IsCreatorOrReadOnly(permissions.BasePermission):
         return obj.user == request.user
 
 
+class IsGroupEditor(permissions.BasePermission):
+    message = 'You have to be a group editor for this action.'
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        return request.user.groups.filter(name='Group Editors').exists()
+
+
 class IsArtist(permissions.BasePermission):
     message = 'You have to be a registered artist for this action.'
 

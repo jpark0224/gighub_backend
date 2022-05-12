@@ -11,5 +11,8 @@ class Group(models.Model):
     users = models.ManyToManyField(
         ExtendedUser, blank=True, related_name="users_following_group")
 
+    creator = models.ForeignKey(ExtendedUser,
+                                on_delete=models.SET_NULL, null=True, related_name="created_user")
+
     def __str__(self):
         return f"{self.name}"

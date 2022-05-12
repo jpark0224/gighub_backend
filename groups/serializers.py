@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class GroupSerializer(serializers.ModelSerializer):
+    creator = UserSerializer()
     users = UserSerializer(many=True)
     # posts = PostSerializer()
 
@@ -23,20 +24,26 @@ class GroupSerializer(serializers.ModelSerializer):
 
     # data is already validated
     def create(self, data):
+        creator_data = data.pop("creator")
         user_data = data.pop("users")
         # post_data = data.pop("posts")
 
         group = Group(
             name=data["name"],
             profile_picture=data["profile_picture"],
-        )
+            creator=data["creator"])
 
         # many to many
         if user_data:
             for user in user_data:
-                newUser, _created = User.objects.get_or_create(
+                newUser, _created = ExtendedUser.objects.get_or_create(
                     **user)
                 group.locations.add(newUser)
+
+        if creator_data:
+            creator, _created = ExtendedUser.objects.get_or_create(
+                **user_data)
+            group.creator = creator
 
         group.save()
 
@@ -44,6 +51,7 @@ class GroupSerializer(serializers.ModelSerializer):
         return group
 
     def update(self, group, data):
+        creator_data = data.pop("creator")
         user_data = data.pop("users")
         # post_data = data.pop("posts")
 
@@ -53,9 +61,14 @@ class GroupSerializer(serializers.ModelSerializer):
 
         if user_data:
             for user in user_data:
-                newUser, _created = User.objects.get_or_create(
+                newUser, _created = ExtendedUser.objects.get_or_create(
                     **user)
                 group.locations.add(newUser)
+
+        if creator_data:
+            creator, _created = ExtendedUser.objects.get_or_create(
+                **user_data)
+            group.creator = creator
 
         group.save()
 
