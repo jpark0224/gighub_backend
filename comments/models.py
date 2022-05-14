@@ -12,15 +12,14 @@ class Comment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
+    created_by = models.ForeignKey(ExtendedUser,
+                                   on_delete=models.SET_NULL, null=True, related_name="commented_user")
 
-    group = models.ForeignKey(
-        Group, null=True, blank=True, on_delete=models.CASCADE, related_name="commented_group")
     post = models.ForeignKey(
-        Post, null=True, blank=True, on_delete=models.CASCADE, related_name="commented_post")
-    user = models.ForeignKey(ExtendedUser,
-                             on_delete=models.CASCADE, related_name="commented_user")
-    liked_user = models.ForeignKey(ExtendedUser, default='',
-                                   on_delete=models.CASCADE, related_name="comment_liked_user")
+        Post, null=True, on_delete=models.CASCADE, related_name="commented_post")
+
+    liked_user = models.ManyToManyField(ExtendedUser,
+                                        blank=True, default=None, related_name="comment_liked")
 
     def __str__(self):
         return f"{self.contents}"

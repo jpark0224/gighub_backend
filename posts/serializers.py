@@ -1,3 +1,4 @@
+from typing import Dict
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
@@ -9,20 +10,23 @@ from users.models import ExtendedUser
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-        fields = ("name",)
+        fields = ("name", )
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExtendedUser
-        fields = ("email", "display_name", "is_artist", "profile_picture", )
+        fields = ("display_name", "username", "profile_picture", "is_artist", )
 
 
 class PostSerializer(serializers.ModelSerializer):
     group = GroupSerializer()
-    user = UserSerializer()
-    liked_user = UserSerializer()
-    bookmarked_user = UserSerializer()
+    # created_by = serializers.StringRelatedField()
+    created_by = UserSerializer(read_only=True)
+    # liked_user = UserSerializer()
+    # bookmarked_user = UserSerializer()
+    comments = serializers.PrimaryKeyRelatedField(
+        many=True, read_only=True)
 
     class Meta:
         model = Post
@@ -31,8 +35,7 @@ class PostSerializer(serializers.ModelSerializer):
     # def validate(self, attrs):
     #     # add some custom validation
 
-    #     # 1. get the currently logged in user
-    #     # 2. check that the user is premium
+    #     # get the currently logged in user
 
     #     request = self.context.get("request")
     #     if request and hasattr(request, "user"):
@@ -45,29 +48,13 @@ class PostSerializer(serializers.ModelSerializer):
 
     # data is already validated
     def create(self, data):
-        user_data = data.pop("user")
-        liked_user_data = data.pop("liked_user")
-        bookmarked_user_data = data.pop("bookmarked_user")
         group_data = data.pop("group")
+        # created_by_data = data.pop("created_by")
 
         post = Post(
             contents=data["contents"],
             picture=data["picture"],
         )
-
-        if liked_user_data:
-            liked_user, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            post.liked_user = liked_user
-
-        if bookmarked_user_data:
-            bookmarked_user, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            post.bookmarked_user = bookmarked_user
-
-        if user_data:
-            user, _created = ExtendedUser.objects.get_or_create(**user_data)
-            post.user = user
 
         if group_data:
             group, _created = Group.objects.get_or_create(**group_data)
@@ -76,7 +63,8 @@ class PostSerializer(serializers.ModelSerializer):
         # set the creator of a post to be the currently logged-in user
         request = self.context.get("request")
         if request and hasattr(request, "user"):
-            post.user = request.user
+            post.created_by = request.user
+            # post.created_by_username = request.user.username
 
         # Need to save to get the id
         post.save()
@@ -104,11 +92,11 @@ class PostSerializer(serializers.ModelSerializer):
             post.bookmarked_user = bookmarked_user
 
         if user_data:
-            user, _created = ExtendedUser.objects.get_or_create(**user_data)
+            user, _created = ExtendedUser.objects.get(**user_data)
             post.user = user
 
         if group_data:
-            group, _created = Group.objects.get_or_create(**group_data)
+            group, _created = Group.objects.get(**group_data)
             post.group = group
 
         # set the creator of a post to be the currently logged-in user

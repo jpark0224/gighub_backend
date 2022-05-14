@@ -8,11 +8,11 @@ from users.models import ExtendedUser
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExtendedUser
-        fields = ("email", "display_name", "is_artist", "profile_picture", )
+        fields = ("display_name", "is_artist", "profile_picture", )
 
 
 class GroupSerializer(serializers.ModelSerializer):
-    creator = UserSerializer()
+    created_by = UserSerializer()
     users = UserSerializer(many=True)
     # posts = PostSerializer()
 
@@ -24,26 +24,25 @@ class GroupSerializer(serializers.ModelSerializer):
 
     # data is already validated
     def create(self, data):
-        creator_data = data.pop("creator")
+        created_by_data = data.pop("created_by")
         user_data = data.pop("users")
         # post_data = data.pop("posts")
 
         group = Group(
             name=data["name"],
-            profile_picture=data["profile_picture"],
-            creator=data["creator"])
+            profile_picture=data["profile_picture"],)
 
         # many to many
         if user_data:
             for user in user_data:
                 newUser, _created = ExtendedUser.objects.get_or_create(
                     **user)
-                group.locations.add(newUser)
+                group.users.add(newUser)
 
-        if creator_data:
-            creator, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            group.creator = creator
+        if created_by_data:
+            created_by, _created = ExtendedUser.objects.get_or_create(
+                **created_by_data)
+            group.created_by = created_by
 
         group.save()
 
@@ -51,7 +50,7 @@ class GroupSerializer(serializers.ModelSerializer):
         return group
 
     def update(self, group, data):
-        creator_data = data.pop("creator")
+        created_by_data = data.pop("created_by")
         user_data = data.pop("users")
         # post_data = data.pop("posts")
 
@@ -63,12 +62,12 @@ class GroupSerializer(serializers.ModelSerializer):
             for user in user_data:
                 newUser, _created = ExtendedUser.objects.get_or_create(
                     **user)
-                group.locations.add(newUser)
+                group.users.add(newUser)
 
-        if creator_data:
-            creator, _created = ExtendedUser.objects.get_or_create(
+        if created_by_data:
+            created_by, _created = ExtendedUser.objects.get_or_create(
                 **user_data)
-            group.creator = creator
+            group.created_by = created_by
 
         group.save()
 

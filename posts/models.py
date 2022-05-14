@@ -12,16 +12,22 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
+    created_by = models.ForeignKey(ExtendedUser, null=True,
+                                   on_delete=models.CASCADE, related_name="posts")
+    # created_by_username = models.ForeignKey(ExtendedUser, null=True,
+    #                                         on_delete=models.CASCADE, related_name="posts_user")
+    # created_by_profile_picture = models.ForeignKey(ExtendedUser, null=True,
+    #                                                on_delete=models.CASCADE, related_name="posts_profile_picture")
+    # created_by_is_artist = models.ForeignKey(ExtendedUser, null=True,
+    #                                          on_delete=models.CASCADE, related_name="posts_is_artist")
 
     group = models.ForeignKey(
-        Group, null=True, blank=True, on_delete=models.CASCADE, related_name="posted_group")
-    user = models.ForeignKey(ExtendedUser,
-                             on_delete=models.CASCADE, related_name="posted_user")
+        Group, null=True, on_delete=models.CASCADE, related_name="posts")
 
-    liked_user = models.ForeignKey(ExtendedUser, default='',
-                                   on_delete=models.CASCADE, related_name="post_liked_user")
-    bookmarked_user = models.ForeignKey(ExtendedUser, default='',
-                                        on_delete=models.CASCADE, related_name="bookmarked_user")
+    liked_user = models.ManyToManyField(ExtendedUser,
+                                        blank=True, default=None, related_name="liked_posts")
+    bookmarked_user = models.ManyToManyField(ExtendedUser,
+                                             blank=True, default=None, related_name="bookmarked_posts")
 
     def __str__(self):
         return f"{self.contents}"
