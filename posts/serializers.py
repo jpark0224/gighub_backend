@@ -1,10 +1,10 @@
-from typing import Dict
 from rest_framework import serializers
 from django.contrib.auth.models import User
 
 from groups.models import Group
 from posts.models import Post
 from users.models import ExtendedUser
+from comments.models import Comment
 
 
 class GroupSerializer(serializers.ModelSerializer):
@@ -19,13 +19,21 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ("display_name", "username", "profile_picture", "is_artist", )
 
 
+class CommentsSerializer(serializers.ModelSerializer):
+    created_by = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
+
 class PostSerializer(serializers.ModelSerializer):
     group = GroupSerializer()
     # created_by = serializers.StringRelatedField()
     created_by = UserSerializer(read_only=True)
-    # liked_user = UserSerializer()
-    # bookmarked_user = UserSerializer()
-    comments = serializers.PrimaryKeyRelatedField(
+    liked_user = UserSerializer(many=True, read_only=True)
+    # bookmarked_user = UserSerializer(read_only=True)
+    comments_on_post = CommentsSerializer(
         many=True, read_only=True)
 
     class Meta:

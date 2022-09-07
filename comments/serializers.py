@@ -13,15 +13,15 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ("id", )
 
 
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = ExtendedUser
-#         fields = ("email", "display_name", "is_artist", "profile_picture", )
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExtendedUser
+        fields = ("email", "display_name", "is_artist", "profile_picture", )
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    # created_by = UserSerializer()
-    # liked_user = UserSerializer()
+    created_by = UserSerializer(read_only=True)
+    liked_user = UserSerializer(many=True, read_only=True)
     # post = serializers.PrimaryKeyRelatedField(read_only=True)
     post_id = serializers.IntegerField(write_only=True)
     # post = PostSerializer()

@@ -16,7 +16,7 @@ class Comment(models.Model):
                                    on_delete=models.SET_NULL, null=True, related_name="commented_user")
 
     post = models.ForeignKey(
-        Post, null=True, on_delete=models.CASCADE, related_name="commented_post")
+        Post, null=True, on_delete=models.CASCADE, related_name="comments_on_post")
 
     liked_user = models.ManyToManyField(ExtendedUser,
                                         blank=True, default=None, related_name="comment_liked")
