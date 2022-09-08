@@ -11,11 +11,18 @@ from posts.serializers import PostSerializer
 
 
 class PostListView(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+    def get_queryset(self):
+        if self.request.method == "GET":
+            queryset = Post.objects.order_by("-created_at")
+            group = self.request.GET.get("group", None)
+            if group is not None:
+                queryset = queryset.filter(group_id=group)
+            return queryset
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsCreatorOrReadOnly]
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
