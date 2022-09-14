@@ -8,7 +8,7 @@ from users.models import ExtendedUser
 
 class Post(models.Model):
     contents = models.TextField()
-    picture = models.URLField(null=True, blank=True)
+    picture = models.URLField(null=True, blank=True, default=None)
 
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)

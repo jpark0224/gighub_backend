@@ -81,36 +81,31 @@ class PostSerializer(serializers.ModelSerializer):
         return post
 
     def update(self, post, data):
-        user_data = data.pop("user")
-        liked_user_data = data.pop("liked_user")
-        bookmarked_user_data = data.pop("bookmarked_user")
-        group_data = data.pop("group")
+        # set the creator of a post to be the currently logged-in user
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            post.user = request.user
+
+        liked_user_data = data.pop("liked_user", [])
+        print(liked_user_data)
+        # bookmarked_user_data = data.pop("bookmarked_user")
 
         post.contents = data.get("contents", post.contents)
         post.picture = data.get("picture", post.picture)
 
         if liked_user_data:
             liked_user, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            post.liked_user = liked_user
+                **liked_user_data)
+            post.liked_user = request.user
 
-        if bookmarked_user_data:
-            bookmarked_user, _created = ExtendedUser.objects.get_or_create(
-                **user_data)
-            post.bookmarked_user = bookmarked_user
+        # if bookmarked_user_data:
+        #     bookmarked_user, _created = ExtendedUser.objects.get_or_create(
+        #         **user_data)
+        #     post.bookmarked_user = bookmarked_user
 
-        if user_data:
-            user, _created = ExtendedUser.objects.get(**user_data)
-            post.user = user
-
-        if group_data:
-            group, _created = Group.objects.get(**group_data)
-            post.group = group
-
-        # set the creator of a post to be the currently logged-in user
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            post.user = request.user
+        # if user_data:
+        #     user, _created = ExtendedUser.objects.get(**user_data)
+        #     post.user = user
 
         # Need to save to get the id
         post.save()
