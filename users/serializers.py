@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 from users.models import ExtendedUser
+from django.core.files.base import ContentFile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -36,18 +37,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, data):
 
-        if hasattr(data, "profile_picture"):
-            profile_picture_input = data["profile_picture"]
-        else:
-            profile_picture_input = ""
-
-        user = ExtendedUser.objects.create(
-            username=data['username'],
-            display_name=data['display_name'],
-            password=data['password'],
-            email=data['email'],
-            profile_picture=profile_picture_input)
-
+        try:
+            user = ExtendedUser.objects.create(
+                username=data['username'],
+                display_name=data['display_name'],
+                password=data['password'],
+                email=data['email'],
+                profile_picture=data['profile_picture']
+        )
+        except KeyError:
+            user = ExtendedUser.objects.create(
+                username=data['username'],
+                display_name=data['display_name'],
+                password=data['password'],
+                email=data['email'],
+        )
+        
         user.set_password(data['password'])
 
         user.save()
