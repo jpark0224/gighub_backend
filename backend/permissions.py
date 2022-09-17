@@ -13,6 +13,17 @@ class IsCreatorOrReadOnly(permissions.BasePermission):
             return True
         return obj.created_by == request.user
 
+class IsRequestingUserOrReadOnly(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        if request.user and request.user.is_authenticated:
+            return True
+        return False
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj.username == request.user.username
 
 class IsGroupEditor(permissions.BasePermission):
     message = 'You have to be a group editor for this action.'

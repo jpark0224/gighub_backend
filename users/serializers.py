@@ -59,6 +59,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
+    def update(request):
+        user_profile = ExtendedUser.objects.get(username=request.username)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
