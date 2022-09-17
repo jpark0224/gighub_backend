@@ -14,6 +14,7 @@ class IsCreatorOrReadOnly(permissions.BasePermission):
         return obj.created_by == request.user
 
 class IsRequestingUserOrReadOnly(permissions.BasePermission):
+    message = 'You have to log in as this user for this action.'
 
     def has_permission(self, request, view):
         if request.user and request.user.is_authenticated:
