@@ -59,8 +59,38 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return user
 
-    def update(request):
-        user_profile = ExtendedUser.objects.get(username=request.username)
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExtendedUser
+        fields = ('display_name', 
+                  'profile_picture')
+
+    def update(self, user, data):
+        user_profile = ExtendedUser.objects.get(username=user)
+
+        if 'display_name' in data and 'profile_picture' in data:
+            display_name_data = data.pop('display_name')
+            profile_picture_data = data.pop('profile_picture')
+            user.display_name = display_name_data
+            user.profile_picture = profile_picture_data
+
+        elif 'display_name' in data:
+            display_name_data = data.pop('display_name')
+            user.display_name = display_name_data
+            user.profile_picture = user_profile.profile_picture
+
+        elif 'profile_picture' in data:
+            profile_picture_data = data.pop('profile_picture')
+            user.profile_picture = profile_picture_data
+            user.display_name = user_profile.display_name
+        
+        else:
+            user.display_name = user_profile.display_name
+            user.profile_picture = user_profile.profile_picture
+
+        user.save()
+
+        return user
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
