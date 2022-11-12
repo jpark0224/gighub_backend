@@ -108,15 +108,19 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # added this to use postgres as the databse instead of the default sqlite.
 # do this before running the initial migrations or you will need to do it again.
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'gighub',
+#         'HOST': 'localhost',
+#         'PORT': 5432
+#     }
+# }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gighub',
-        'HOST': 'localhost',
-        'PORT': 5432
-    }
+    'default': dj_database_url.config(
+        default='postgres://julie@localhost/gighub', conn_max_age=600
+    )
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
