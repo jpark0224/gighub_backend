@@ -108,15 +108,20 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # added this to use postgres as the databse instead of the default sqlite.
 # do this before running the initial migrations or you will need to do it again.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gighub',
-        'HOST': 'localhost',
-        'PORT': 5432
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'gighub',
+#         'HOST': 'localhost',
+#         'PORT': 5432
+#     }
+# }
 
+DATABASES = {
+    'default': dj_database_url.config(
+        default='postgres://julie@localhost/gighub', conn_max_age=600
+    )
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -155,10 +160,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 # Location where django collect all static files
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 # Default primary key field type
