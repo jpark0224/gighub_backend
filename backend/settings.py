@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'corsheaders',
+    'storages',
 
     # 1st Party
     'users',
@@ -152,17 +153,33 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
-# Location where django collect all static files
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# # Location where django collect all static files
+# # STATIC_ROOT = os.path.join(BASE_DIR, "static")
+# # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
+
+AWS_ACCESS_KEY_ID = 'AKIAVSQGXV53H5NJDP5G'
+AWS_SECRET_ACCESS_KEY = '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'
+
+AWS_STORAGE_BUCKET_NAME = 'gighubsocial'
+AWS_S3_CUSTOM_DOMAIN = 'd3io2mpnufpriy.cloudfront.net'
+
+AWS_LOCATION = 'static'
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'backend.storage_backends.MediaStorage' #the media storage configurations
+
+STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -194,5 +211,6 @@ DATABASES = {
     )
 }
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
